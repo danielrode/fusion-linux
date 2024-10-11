@@ -22,4 +22,6 @@ then
 fi
 
 # Execute FUSION utility via WINE
-wine "$1".exe
+fusion_util="$1"
+shift
+wine "$fusion_util".exe "$@"
