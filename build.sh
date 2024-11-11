@@ -19,7 +19,6 @@ else
   exit 1
 fi
 
-
 # Build container
 cd "$(dirname "$0")"
 $container_manager build --tag "$CONTAINER_NAME" .
