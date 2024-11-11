@@ -1,19 +1,18 @@
 # Author: Daniel Rode
 # Dependencies:
-#   Docker 27.1.1 OR Podman 5.1.2
-# Created: 19 Aug 2024
-# Updated: 21 Aug 2024
+#   Docker 27.1.1 OR Podman 5.2.3
 
 
 # https://docs.docker.com/reference/dockerfile/
 
 
-LABEL Author="Daniel Rode"
-LABEL Version="2"
-
 # Build the image based on the official Alpine Linux image
 FROM alpine:3.20
 WORKDIR /root
+
+# Set image labels
+LABEL Author="Daniel Rode"
+LABEL Version="2"
 
 # Build and install software/dependencies
 RUN ash <<'EOF'

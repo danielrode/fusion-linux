@@ -5,17 +5,17 @@ Containerized [FUSION](https://research.fs.usda.gov/pnw/products/dataandtools/to
 ## Build Container on Fedora Linux
 
 ```sh
-sudo dnf install git podman apptainer  # Run once
+sudo dnf install git podman
 git clone https://github.com/VogelerLab/fusion-linux
 cd fusion-linux
-USE_PODMAN=true bash ./build.sh
+bash ./build.sh
 ```
 
 ## Run Container on Fedora Linux
 
 ```sh
-sudo dnf install podman remmina  # Run once
-USE_PODMAN=true bash ./run.sh fusion &
+sudo dnf install podman remmina
+bash ./run.sh fusion &
 remmina --connect vnc://localhost:5900
 ```
 

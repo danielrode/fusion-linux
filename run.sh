@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Dependencies:
 #   Bash 4+
-#   Docker 27.1.1 OR Podman 5.1.2 OR Apptainer 1.3.3
+#   Docker 27.1.1 OR Podman 5.2.3 OR Apptainer 1.3.3
 
 
 CONTAINER_NAME="fusion-linux:latest"
@@ -31,7 +31,15 @@ then
   shift
   apptainer exec "${APPTAINER_OPTS[@]}" "$docker_image_path" "$@"
 else
-  container_manager=docker
-  [[ $USE_PODMAN == true ]] && container_manager=podman
+  if command -v podman > /dev/null
+  then
+    container_manager=podman
+  elif command -v docker > /dev/null
+  then
+    container_manager=docker
+  else
+    echo "error: No suitable container manager was found"
+    exit 1
+  fi
   $container_manager run "${DOCKER_OPTS[@]}" "$CONTAINER_NAME" "$@"
 fi
