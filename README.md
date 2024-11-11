@@ -8,12 +8,12 @@ Containerized
 
 1. Open cmd.exe prompt
 2. `winget install -e --id RedHat.Podman`
-3. Allow admin privileges request and finish install wizard
-4. Close cmd.exe prompt window
-5. Open new cmd.exe prompt (this is necessary to recognize the new install)
-6. `podman machine init`
-7. `podman machine start`
-8. `podman run ghcr.io/danielrode/fusion-linux:main`
+3. Approve admin privileges request and finish install wizard
+4. Close cmd.exe prompt window and then open a new cmd.exe prompt
+(this is necessary to recognize the new install)
+5. `podman machine init`
+6. `podman machine start`
+7. `podman run ghcr.io/danielrode/fusion-linux:main`
 
 ## Run Container on Fedora Linux
 
