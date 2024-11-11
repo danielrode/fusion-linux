@@ -8,7 +8,7 @@ Containerized
 
 ```sh
 sudo dnf install podman remmina
-docker run ghcr.io/VogelerLab/fusion-linux:main
+docker run ghcr.io/vogelerlab/fusion-linux:main
 remmina --connect vnc://localhost:5900
 ```
 
