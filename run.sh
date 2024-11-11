@@ -5,6 +5,9 @@
 
 
 CONTAINER_NAME="fusion-linux:latest"
+# TODO run command to pull container image first from github and then tag it
+# fusion-linux:latest, then call the container by that name to start it.
+CONTAINER_NAME="ghcr.io/danielrode/fusion-linux:main"
 PORT="5900:5900"
 DOCKER_OPTS=(
   --publish $PORT
@@ -27,9 +30,7 @@ fi
 
 if [[ -n $SLURM_JOB_ID ]]
 then
-  docker_image_path="$1"
-  shift
-  apptainer exec "${APPTAINER_OPTS[@]}" "$docker_image_path" "$@"
+  apptainer exec "${APPTAINER_OPTS[@]}" "$CONTAINER_NAME" "$@"
 else
   if command -v podman > /dev/null
   then
