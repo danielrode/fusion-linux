@@ -5,12 +5,10 @@
 
 
 CONTAINER_NAME="fusion-linux:latest"
-# TODO run command to pull container image first from github and then tag it
-# fusion-linux:latest, then call the container by that name to start it.
-CONTAINER_NAME="ghcr.io/danielrode/fusion-linux:main"
+CONTAINER_GIT_URL="ghcr.io/danielrode/fusion-linux:main"
 PORT="5900:5900"
 DOCKER_OPTS=(
-  --publish $PORT
+  --publish "$PORT"
   --mount "type=bind,source=$(pwd),target=/portal"
 )
 APPTAINER_OPTS=(
@@ -22,25 +20,47 @@ APPTAINER_OPTS=(
 )
 
 
+# Parse command line options
 if [[ $1 == --debug ]]
 then
   shift
   DOCKER_OPTS+=( --interactive --tty --entrypoint /bin/sh )
 fi
 
-if [[ -n $SLURM_JOB_ID ]]
+# Determine which container manager to use
+if command -v docker > /dev/null
 then
-  apptainer exec "${APPTAINER_OPTS[@]}" "$CONTAINER_NAME" "$@"
+  container_check_cmd=(docker image inspect "$CONTAINER_NAME")
+  container_pull_cmd=(docker pull)
+  container_tag_cmd=(docker image tag "$CONTAINER_GIT_URL" "$CONTAINER_NAME")
+  container_run_cmd=(docker run "${DOCKER_OPTS[@]}" "$CONTAINER_NAME")
+elif command -v podman > /dev/null
+then
+  container_check_cmd=(podman image inspect "$CONTAINER_NAME")
+  container_pull_cmd=(podman pull)
+  container_tag_cmd=(podman image tag "$CONTAINER_GIT_URL" "$CONTAINER_NAME")
+  container_run_cmd=(podman run "${DOCKER_OPTS[@]}" "$CONTAINER_NAME")
+elif command -v apptainer > /dev/null
+then
+  sif_name=fusion-linux-main.sif
+  container_check_cmd=(test -e "$sif_name")
+  container_pull_cmd=(apptainer pull
+    "$container_name"
+    "docker://$CONTAINER_GIT_URL"
+  )
+  container_tag_cmd=(:)  # Do nothing
+  container_run_cmd=(apptainer run "${APPTAINER_OPTS[@]}" "$sif_name")
 else
-  if command -v podman > /dev/null
-  then
-    container_manager=podman
-  elif command -v docker > /dev/null
-  then
-    container_manager=docker
-  else
-    echo "error: No suitable container manager was found"
-    exit 1
-  fi
-  $container_manager run "${DOCKER_OPTS[@]}" "$CONTAINER_NAME" "$@"
+  echo "error: No suitable container manager was found"
+  exit 1
 fi
+
+# Retrieve container image, if necessary
+if ! "${container_check_cmd[@]}" &> /dev/null
+then
+  "${container_pull_cmd}" "$CONTAINER_GIT_URL"
+  "${container_tag_cmd}"
+fi
+
+# Run container
+"${container_run_cmd[@]}" "$@"
