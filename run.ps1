@@ -1,24 +1,28 @@
 # Dependencies:
 #   Windows 11
 #   PowerShell 5+
+#   WSL 2
+#   Podman 5.2.4
 
 
-# Install Podman
-winget install -e --id RedHat.Podman
+$CONTAINER_NAME = "fusion-linux:latest"
+$PORT = "5900:5900"
+$DOCKER_OPTS = @(
+  "--publish", $PORT
+  "--mount", "type=bind,source=$(pwd),target=/portal"
+)
 
-# NOTE: Approve admin privileges GUI prompt and finish install wizard
 
-# Refresh PATH variable (so `podman` command works)
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
+# Make sure container machine backend is setup and running
+podman machine init
+podman machine start
 
 # Retrieve container image, if necessary
-podman image inspect fusion-linux:latest *> /dev/null
+podman image inspect fusion-linux:latest *> $null
 if (-not $?) {
     podman pull ghcr.io/danielrode/fusion-linux:main
-    podman image tag ghcr.io/danielrode/fusion-linux:main fusion-linux:latest
+    podman image tag ghcr.io/danielrode/fusion-linux:main $CONTAINER_NAME
 }
 
 # Run container
-podman machine init
-podman machine start
-podman run fusion-linux:latest @args
+podman run @DOCKER_OPTS fusion-linux:latest @args

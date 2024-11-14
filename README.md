@@ -42,14 +42,30 @@ Windows too. It may be useful when reproducibility is important.
 ```powershell
 # PowerShell
 
-winget install -e --id Git.Git
-# Complete install via GUI popups
-set-alias -name git -value 'C:\Program Files\Git\bin\git.exe'
-git clone https://github.com/danielrode/fusion-linux
-& .\fusion-linux\run.ps1 fusion
-```
+winget install -e --id Git.MinGit
+winget install -e --id VirtualGL.TurboVNC
+winget install -e --id RedHat.Podman
+wsl --install --no-distribution
 
-TODO Once container is running, remote into it.
+# WARNING: The next command will reboot your computer.
+# Make sure you save any open files first.
+restart-computer
+
+function ensure-file-exists {
+  new-item -ItemType directory -path (split-path $args -parent) -force
+  new-item -ItemType file -path "$args" -ErrorAction silentlycontinue
+}
+ensure-file-exists "$($env:USERPROFILE)\.ssh\known_hosts"
+git clone https://github.com/danielrode/fusion-linux
+start-process powershell {
+  -ExecutionPolicy bypass .\fusion-linux\run.ps1 fusion
+}
+
+# Wait for container to finish loading before running the next command to
+# connect to it
+
+& "C:\Program Files\TurboVNC\vncviewerw.bat" localhost:5900
+```
 
 ## Building Container
 
